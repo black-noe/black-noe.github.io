@@ -165,10 +165,12 @@
 		
 
 		var pio = new Paul_Pio({
-			"mode": "fixed",
+			"mode": "draggable",
 			"hidden": true,
 			"content": {
 					"welcome": ["欢迎来到保罗的小宇宙！", "今天天气不错，一起来玩吧！", "博主每天都有些折腾记录，欢迎前往他的小窝阅读~"],
+					"close": "QWQ 有缘再会吧~",
+					"skin": ["想看看我的新服装吗？", "新衣服真漂亮~"],
 					"custom": [
 							{"selector": ".comment-form", "text": "欢迎参与本文评论，别发小广告噢~"},
 							{"selector": ".home-social a:last-child", "text": "在这里可以了解博主的日常噢~"},
