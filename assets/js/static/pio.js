@@ -142,7 +142,7 @@ var Paul_Pio = function (prop) {
         buttons: function () {
             // 返回首页
             elements.home.onclick = function () {
-                location.href = current.root;
+                // location.href = current.root;
             };
             elements.home.onmouseover = function () {
                 modules.render(prop.content.home || "点击这里回到首页！");
@@ -168,16 +168,16 @@ var Paul_Pio = function (prop) {
             };
             current.menu.appendChild(elements.info);
 
-            // 夜间模式
-            if(prop.night){
-                elements.night.onclick = function () {
-                    typeof prop.night === "function" ? prop.night() : eval(prop.night);
-                };
-                elements.night.onmouseover = function () {
-                    modules.render("夜间点击这里可以保护眼睛呢");
-                };
-                current.menu.appendChild(elements.night);
-            }
+            // // 夜间模式
+            // if(prop.night){
+            //     elements.night.onclick = function () {
+            //         typeof prop.night === "function" ? prop.night() : eval(prop.night);
+            //     };
+            //     elements.night.onmouseover = function () {
+            //         modules.render("夜间点击这里可以保护眼睛呢");
+            //     };
+            //     current.menu.appendChild(elements.night);
+            // }
 
             // 关闭看板娘
             elements.close.onclick = function () {

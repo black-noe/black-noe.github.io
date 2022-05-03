@@ -177,6 +177,6 @@
 					]
 			},
 			"night": "single.night()",
-			"model": ["https://paugram.com/usr/plugins/Pio/models/yuan/model.json"]
+			"model": ['assets/js/models/pio/model.json']
 		});
 })(jQuery);
