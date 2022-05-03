@@ -156,4 +156,10 @@
 			}
 		});
 
+		//每日语句
+		const daily = document.querySelector('.daily')
+		$.post('https://tenapi.cn/yiyan/?format=json', (res => {
+			let data = JSON.parse(res)
+			daily.innerHTML = data.hitokoto + '  -  ' + data.source
+		}))
 })(jQuery);
