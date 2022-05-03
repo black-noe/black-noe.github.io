@@ -9,10 +9,16 @@
 		<title>春卷的博客</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
 		<link href="https://tenapi.cn/qqimg/?qq=2744881984" rel="icon" type="image/x-ico">
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link href='assets/js/static/pio.css' rel='stylesheet' type='text/css'/>
 	</head>
 	<body class="is-preload">
+
+		<div class="pio-container left">
+			<div class="pio-action"></div>
+			<canvas id="pio" width="190" height="200"></canvas>
+	</div>
 
 		<!-- Header -->
 			<section id="header">
@@ -147,6 +153,10 @@
 			</div>
 
 		<!-- Scripts -->
+				<!-- 引用 Live2D 核心组件 -->
+			<script src='assets/js/static/l2d.js'></script>
+			<!-- 引用看板娘交互组件 -->
+			<script src='assets/js/static/pio.js'></script>
 			<script src="assets/js/jquery.min.js"></script>
 			<script src="assets/js/jquery.scrollex.min.js"></script>
 			<script src="assets/js/jquery.scrolly.min.js"></script>
