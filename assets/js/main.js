@@ -156,7 +156,7 @@
 			}
 		});
 
-		//每日语句
+		//语句推送
 		const daily = document.querySelector('.daily')
 		$.post('https://tenapi.cn/yiyan/?format=json', (res => {
 			let data = JSON.parse(res)
