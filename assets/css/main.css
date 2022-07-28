@@ -2666,6 +2666,11 @@ input, select, textarea {
 			padding-top: 0;
 		}
 
+		.features article iframe{
+			width: 100%;
+			height: 100%;
+		}
+
 		.features article .image {
 			display: inline-block;
 			padding-right: 2.5em;
