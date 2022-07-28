@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8>
+    <title>VR场景</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+    </style>
+</head>
+<body onload="init()">
+<script src="https://cdn.bootcss.com/dat-gui/0.7.1/dat.gui.min.js"></script>
+<script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/three.js/r134/three.js"></script>
+<script src="../js/OrbitControls.js"></script>
+<script>
+    //声明一些全局变量
+    var 
+    renderer,
+    camera, 
+    scene, 
+    geometry,
+    material, 
+    mesh, 
+    stats,
+    control
+
+    controls = {
+      Scenes: 'map1'
+    };
+
+    //初始化OrbitControls控制器
+    function inintOrbCon(){
+      control = new THREE.OrbitControls(camera, renderer.domElement);
+      control.enablePan = false;    //禁止右键拖拽
+      control.enableZoom = false;   //禁止缩放
+    }
+
+    //渲染OrbitControls
+    function render() { 
+      control.update();
+      renderer.render(scene, camera);
+    }
+        
+    //初始化渲染器
+    function initRenderer() {
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,     //抗锯齿
+      }); //实例化渲染器
+      renderer.setPixelRatio(window.devicePixelRatio);  //设备像素比率
+      renderer.setSize(window.innerWidth, window.innerHeight); //设置宽和高
+      document.body.appendChild(renderer.domElement); //添加到dom
+    }
+
+    //dat.gui选项
+    function updatePosition() { //监听地图切换
+      const cubeTextureLoader = new THREE.CubeTextureLoader();
+      const environmentMapTexture = cubeTextureLoader.setPath(`../hdri/${controls.Scenes}/`).load(
+        [
+          "px.png", "nx.png", 
+          "py.png", "ny.png", 
+          "pz.png", "nz.png"
+        ],
+          () => {
+            scene.background = environmentMapTexture;
+          },
+          undefined,
+          (e) => {
+            console.log(e);
+          }
+      )
+    }
+
+    function initLight() {
+      const light = new THREE.DirectionalLight(0xffffff); //添加了一个白色的平行光
+      light.position.set(20, 50, 50); //设置光的方向
+      scene.add(light); //添加到场景
+
+      //添加一个全局环境光
+      scene.add(new THREE.AmbientLight(0x222222));
+    }
+    //初始化dat.gui
+    function initGui(){
+      gui = new dat.GUI();
+      gui.add(controls, "Scenes", ['map1', 'map2'], ).name('场景').onChange(updatePosition);
+    }
+
+    //实例化fps显示器
+    function initStats(){
+      stats = new Stats()
+      document.body.appendChild(stats.dom);
+    }
+
+    //初始化场景
+    function initScene() {
+      scene = new THREE.Scene(); //实例化场景
+      const cubeTextureLoader = new THREE.CubeTextureLoader();
+      const environmentMapTexture = cubeTextureLoader.setPath("../hdri/map1/").load(
+        [
+          "px.png", "nx.png", 
+          "py.png", "ny.png", 
+          "pz.png", "nz.png"
+        ],
+          () => {
+            scene.background = environmentMapTexture;
+          },
+          undefined,
+          (e) => {
+            console.log(e);
+          }
+      )
+    }
+
+    //初始化相机
+    function initCamera() {
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200); //实例化相机
+      camera.position.set(0, 0, 15);
+    }
+
+    //创建模型
+    function initMesh() {
+      geometry =  new THREE.SphereGeometry( 2, 16, 32 )
+
+      const texture = new THREE.TextureLoader().load("../material/a.jpg");//加载纹理贴图
+      material = new THREE.MeshLambertMaterial({
+        map: texture,   //将纹理赋值给材质   
+      })
+
+      mesh = new THREE.Mesh( geometry, material ); //创建网格
+      mesh.scale.set(.5, .5, .5)
+      scene.add( mesh ); //将网格添加到场景
+
+    }
+
+    //运行动画
+    function animate() {
+        requestAnimationFrame(animate); //循环调用函数
+        mesh.rotation.y += 0.02; //每帧网格模型的沿y轴旋转0.02弧度
+        stats.update()  //更新fps显示
+        render()  //OrbitControls控制器渲染
+    }
+
+    //鼠标点击事件
+    function onMouseClick(event) {
+      var raycaster = new THREE.Raycaster();
+      var mouse = new THREE.Vector2();
+
+      //通过鼠标点击的位置计算出射线所需要的点的位置，以屏幕中心为原点，值的范围为-1到1.
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      //根据在屏幕的二维位置以及相机的矩阵更新射线的位置
+      raycaster.setFromCamera(mouse, camera);
+
+      // 获取射线直线和所有模型相交的数组集合
+      var intersects = raycaster.intersectObjects(scene.children, true); //增加第二个参数，可以遍历子子孙孙对象
+
+      //intersects是返回的一个数组，如果当前位置没有可选中的对象，那这个数组为空，否则为多个对象组成的数组，排列顺序为距离屏幕的距离从近到远的顺序排列
+      //数组的每一个子对象内包含：
+      // distance：距离屏幕的距离
+      // face：与射线相交的模型的面
+      // faceIndex：与射线相交的模型的面的下标
+      // object：与射线相交的模型对象
+      // point：射线与模型相交的点的位置坐标
+      // uv：与射线相交的模型的面的uv映射位置
+
+      console.log(intersects);
+      //将所有的相交的模型的颜色设置为红色，如果只需要将第一个触发事件，那就数组的第一个模型改变颜色即可
+      /*for (var i = 0; i < intersects.length; i++) {
+          intersects[i].object.material.color.set(0xff0000);
+      }*/
+
+      //判断当前数组是否为空,不为空则获取最近的的模型，将其颜色修改为红色
+      if(intersects.length > 0){
+        alert('好像某种动物在练习留下的')
+      }
+
+    }
+
+    //初始化函数，页面加载完成是调用
+    function init() {
+        initRenderer()
+        initScene()
+        initLight()
+        initCamera()
+        initMesh()
+        initStats()
+        initGui()
+        inintOrbCon()
+
+        animate();
+        document.addEventListener("click", onMouseClick, false);    //添加点击监听
+    }
+</script>
+</body>
+</html>

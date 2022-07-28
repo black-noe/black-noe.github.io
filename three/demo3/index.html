@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8>
+    <title>GLTFLoader模型加载</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+    </style>
+</head>
+<body onload="init()">
+<script src="https://cdn.bootcss.com/dat-gui/0.7.1/dat.gui.min.js"></script>
+<script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/three.js/r134/three.js"></script>
+<script src="../js/OrbitControls.js"></script>
+<script src="../js/GLTFLoader.js"></script>
+<script>
+    //声明一些全局变量
+    var 
+    renderer,
+    camera, 
+    scene, 
+    geometry,
+    material, 
+    mesh, 
+    stats,
+    control,
+    loader
+
+    controls = {
+      positionX:0,
+      positionY:0,
+      positionZ:0
+    };
+
+    //初始化OrbitControls控制器
+    function inintOrbCon(){
+      control = new THREE.OrbitControls(camera, renderer.domElement);
+    }
+
+    //渲染OrbitControls
+    function render() { 
+      control.update();
+      renderer.render(scene, camera);
+    }
+        
+    //初始化渲染器
+    function initRenderer() {
+      renderer = new THREE.WebGLRenderer(); //实例化渲染器
+      renderer.setSize(window.innerWidth, window.innerHeight); //设置宽和高
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap; // 默认的是，没有设置的这个清晰 THREE.PCFShadowMap
+      document.body.appendChild(renderer.domElement); //添加到dom
+    }
+
+    //dat.gui选项
+    function updatePosition() {
+      mesh.position.set(loader.positionX, loader.positionY, loader.positionZ);
+    }
+
+    //初始化dat.gui
+    function initGui(){
+      gui = new dat.GUI();
+      gui.add(controls, "positionX", -1, 1).onChange(updatePosition);
+      gui.add(controls, "positionY", -1, 1).onChange(updatePosition);
+      gui.add(controls, "positionZ", -1, 1).onChange(updatePosition);
+    }
+
+    //实例化fps显示器
+    function initStats(){
+      stats = new Stats()
+      document.body.appendChild(stats.dom);
+    }
+
+    //初始化场景
+    function initScene() {
+      scene = new THREE.Scene(); //实例化场景
+    } 
+
+    //初始化光影背景
+    function initLight(){ //实例光源
+      const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+      scene.add( light );  //环境光
+      const lightprobe = new THREE.AmbientLightProbe( 0x404040, 2 ); // soft white light
+      scene.add( lightprobe );  //环境光探针
+      const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 ); 
+      scene.add( directionalLight );  //平行光
+    }
+
+    //初始化相机
+    function initCamera() {
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200); //实例化相机
+      camera.position.set(0, 0, 15);
+    }
+
+    //加载模型
+    function initMesh() {
+      let planeGeometry = new THREE.PlaneGeometry(100, 100);
+      let planeMaterial = new THREE.MeshLambertMaterial({color: 0xaaaaaa, side: THREE.DoubleSide});
+      let plane = new THREE.Mesh(planeGeometry, planeMaterial);
+      plane.rotation.x = -0.5 * Math.PI;
+      plane.position.y = -.1;
+      plane.receiveShadow = true; //可以接收阴影
+      scene.add(plane);
+
+      loader = new THREE.GLTFLoader();
+      loader.load('../model/gltf/suv/scene.gltf', function (gltf) {
+        gltf.scene.scale.set(4, 4, 4);
+        scene.add(gltf.scene);
+        var pointLight = new THREE.PointLight(0xff0000); //创建一个白色的点光源
+        pointLight.position.set( 50, 50, 50 );
+        scene.add( pointLight );
+      });
+    }
+
+    //运行动画
+    function animate() {
+        requestAnimationFrame(animate); //循环调用函数
+        stats.update()  //更新fps显示
+        render()  //OrbitControls控制器渲染
+    }
+
+    //初始化函数，页面加载完成是调用
+    function init() {
+        initRenderer()
+        initScene()
+        initLight()
+        initCamera()
+        initMesh()
+        initStats()
+        initGui()
+        inintOrbCon()
+
+        animate()
+    }
+</script>
+</body>
+</html>
