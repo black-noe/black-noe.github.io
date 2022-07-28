@@ -17,8 +17,8 @@
 </head>
 <body onload="init()">
 <script src="https://cdn.bootcss.com/dat-gui/0.7.1/dat.gui.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/stats.js/r17/Stats.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/three.js/r134/three.js"></script>
+<script src="../js/Stat.js"></script>
 <script src="../js/OrbitControls.js"></script>
 <script src="../js/GLTFLoader.js"></script>
 <script>
@@ -32,7 +32,8 @@
     mesh, 
     stats,
     control,
-    loader
+    loader,
+    plane
 
     controls = {
       positionX:0,
@@ -62,15 +63,15 @@
 
     //dat.gui选项
     function updatePosition() {
-      mesh.position.set(loader.positionX, loader.positionY, loader.positionZ);
+      plane.position.set(controls.positionX, controls.positionY, controls.positionZ);
     }
 
     //初始化dat.gui
     function initGui(){
       gui = new dat.GUI();
-      gui.add(controls, "positionX", -1, 1).onChange(updatePosition);
-      gui.add(controls, "positionY", -1, 1).onChange(updatePosition);
-      gui.add(controls, "positionZ", -1, 1).onChange(updatePosition);
+      gui.add(controls, "positionX", -10, 10).onChange(updatePosition);
+      gui.add(controls, "positionY", -10, 10).onChange(updatePosition);
+      gui.add(controls, "positionZ", -10, 10).onChange(updatePosition);
     }
 
     //实例化fps显示器
@@ -104,7 +105,7 @@
     function initMesh() {
       let planeGeometry = new THREE.PlaneGeometry(100, 100);
       let planeMaterial = new THREE.MeshLambertMaterial({color: 0xaaaaaa, side: THREE.DoubleSide});
-      let plane = new THREE.Mesh(planeGeometry, planeMaterial);
+      plane = new THREE.Mesh(planeGeometry, planeMaterial);
       plane.rotation.x = -0.5 * Math.PI;
       plane.position.y = -.1;
       plane.receiveShadow = true; //可以接收阴影
